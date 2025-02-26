@@ -1,45 +1,76 @@
 package com.example.demo;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.Assert;
 
+@ExtendWith(MockitoExtension.class)
 @SpringBootTest
 class DemoApplicationTests {
 
 	static double CALC_ERROR = 1;
 
+	static Logarithm logMock;
+	static Trigonometry trigMock;
+	static BasicLogarithm basicLogarithm;
+
 	@BeforeAll
 	static void mockAll() {
-		Mockito.mockStatic(Logarithm.class);
-		Mockito.mockStatic(Trigonometry.class);
+		logMock = Mockito.mock(Logarithm.class);
+		trigMock = Mockito.mock(Trigonometry.class);
+		basicLogarithm = Mockito.mock(BasicLogarithm.class);
 	}
 
 	@ParameterizedTest
 	@CsvSource({
 			"-3.14,0.00,1.00,0.00,0.00,0.00,0.00",
-			"10.00,0.00,0.00,2.30258509,3.32192809,1.430676558,447.711"
+			"2.00,0.00,0.00,0.69314718,1.00,0.430676558,0.6571538335"
 	})
-	void allMocked(double x, 
-			double mockSin, 
-			double mockSec, 
-			double mockLn, 
-			double mockLog2, 
+	void allMocked(double x,
+			double mockSin,
+			double mockSec,
+			double mockLn,
+			double mockLog2,
 			double mockLog5,
 			double expected) {
-		Mockito.when(Trigonometry.sin(x)).thenReturn(mockSin);
-		Mockito.when(Trigonometry.sec(x)).thenReturn(mockSec);
-		Mockito.when(Logarithm.ln(x)).thenReturn(mockLn);
-		Mockito.when(Logarithm.log2(x)).thenReturn(mockLog2);
-		Mockito.when(Logarithm.log5(x)).thenReturn(mockLog5);
+		Mockito.when(trigMock.sin(x)).thenReturn(mockSin);
+		Mockito.when(trigMock.sec(x)).thenReturn(mockSec);
+		Mockito.when(logMock.ln(x)).thenReturn(mockLn);
+		Mockito.when(logMock.log2(x)).thenReturn(mockLog2);
+		Mockito.when(logMock.log5(x)).thenReturn(mockLog5);
 
-		double result = FunctionSystem.count(x);
+		FunctionSystem functionSystem = new FunctionSystem(trigMock, logMock);
+		double result = functionSystem.count(x);
 
 		Assert.isTrue(result <= (expected + CALC_ERROR) && result >= (expected - CALC_ERROR), "");
 	}
 
+	@ParameterizedTest
+	@CsvSource({
+			"-3.14,0.00,1.00,0.00,0.00,0.00,0.00",
+			"2.00,0.00,0.00,0.69314718,0.69314718,1.60943791,0.6571538335"
+	})
+	void mockedTrigAndLn(double x,
+			double mockSin,
+			double mockSec,
+			double mockLn,
+			double mockLn2,
+			double mockLn5,
+			double expected) {
+		Mockito.when(trigMock.sin(x)).thenReturn(mockSin);
+		Mockito.when(trigMock.sec(x)).thenReturn(mockSec);
+		Mockito.when(basicLogarithm.ln(x)).thenReturn(mockLn);
+		Mockito.when(basicLogarithm.ln(2.00)).thenReturn(mockLn2);
+		Mockito.when(basicLogarithm.ln(5.00)).thenReturn(mockLn5);
+
+		FunctionSystem functionSystem = new FunctionSystem(trigMock, new Logarithm(basicLogarithm));
+		double result = functionSystem.count(x);
+
+		Assert.isTrue(result <= (expected + CALC_ERROR) && result >= (expected - CALC_ERROR), "");
+	}
 }

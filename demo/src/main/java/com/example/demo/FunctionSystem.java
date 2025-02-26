@@ -1,26 +1,34 @@
 package com.example.demo;
 
-import org.springframework.stereotype.Service;
-
-@Service
 public class FunctionSystem {
 
-    public static Double count(Double x) {
+    private Trigonometry trigonometry;
+    private Logarithm logarithm;
+
+    public FunctionSystem(Trigonometry trigonometry, Logarithm logarithm) {
+        this.trigonometry = trigonometry;
+        this.logarithm = logarithm;
+    }
+
+    public Double count(Double x) {
         if (x <= 0)
             return firstFunc(x);
         else
             return secondFunc(x);
     }
 
-    private static Double firstFunc(Double x) {
+    private Double firstFunc(Double x) {
         return Math.pow(
-                Math.pow(Math.pow(Math.pow(Trigonometry.sin(x), 3), 3), 2)
-                        * (Trigonometry.sec(x) * Trigonometry.sec(x)),
+                Math.pow(Math.pow(Math.pow(trigonometry.sin(x), 3), 3), 2)
+                        * (trigonometry.sec(x) * trigonometry.sec(x)),
                 3);
     }
 
-    private static Double secondFunc(Double x) {
-        return Math.pow((Logarithm.log5(Math.pow(x, 2)) - Logarithm.log5(x)) / Logarithm.log5(x), 2)
-                + Math.pow(Logarithm.ln(x) * Logarithm.log2(x), 3);
+    private Double secondFunc(Double x) {
+        double log5 = logarithm.log5(x);
+        double log2 = logarithm.log2(x);
+        double ln = logarithm.ln(x);
+        return Math.pow(((Math.pow(log5, 2)) - log5) / log5, 2)
+                + Math.pow(ln * log2, 3);
     }
 }

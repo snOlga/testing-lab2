@@ -1,16 +1,22 @@
 package com.example.demo;
 
 public class Logarithm {
-    
-    public static Double ln(Double x) {
-        return null;
+
+    private BasicLogarithm basicLogarithm;
+
+    public Logarithm(BasicLogarithm basicLogarithm) {
+        this.basicLogarithm = basicLogarithm;
     }
 
-    public static Double log5(Double x) {
-        return null;
+    public Double log2(Double x) {
+        return (basicLogarithm.ln(x) / basicLogarithm.ln(2.00));
     }
 
-    public static Double log2(Double x) {
-        return null;
+    public Double log5(Double x) {
+        return (basicLogarithm.ln(x) / basicLogarithm.ln(5.00));
+    }
+
+    public Double ln(Double x) {
+        return basicLogarithm.ln(x);
     }
 }
