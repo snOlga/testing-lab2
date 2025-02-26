@@ -116,4 +116,23 @@ class DemoApplicationTests {
 
 		Assert.isTrue(result <= (expected + CALC_ERROR) && result >= (expected - CALC_ERROR), "");
 	}
+
+	@ParameterizedTest
+	@CsvSource({
+			"-3.14,0.00,1.00,0.00,0.00,0.00,0.00",
+			"2.00,0.00,0.00,0.69314718,0.69314718,1.60943791,0.6571538335"
+	})
+	void noMock(double x,
+			double mockSin,
+			double mockSec,
+			double mockLn,
+			double mockLn2,
+			double mockLn5,
+			double expected) {
+
+		FunctionSystem functionSystem = new FunctionSystem(new Trigonometry(new BasicTrigonometry()), new Logarithm(new BasicLogarithm()));
+		double result = functionSystem.count(x);
+
+		Assert.isTrue(result <= (expected + CALC_ERROR) && result >= (expected - CALC_ERROR), "");
+	}
 }
