@@ -18,12 +18,14 @@ class DemoApplicationTests {
 	static Logarithm logMock;
 	static Trigonometry trigMock;
 	static BasicLogarithm basicLogarithm;
+	static BasicTrigonometry basicTrigonometry;
 
 	@BeforeAll
 	static void mockAll() {
 		logMock = Mockito.mock(Logarithm.class);
 		trigMock = Mockito.mock(Trigonometry.class);
 		basicLogarithm = Mockito.mock(BasicLogarithm.class);
+		basicTrigonometry = Mockito.mock(BasicTrigonometry.class);
 	}
 
 	@ParameterizedTest
@@ -90,6 +92,26 @@ class DemoApplicationTests {
 		Mockito.when(trigMock.sec(x)).thenReturn(mockSec);
 
 		FunctionSystem functionSystem = new FunctionSystem(trigMock, new Logarithm(new BasicLogarithm()));
+		double result = functionSystem.count(x);
+
+		Assert.isTrue(result <= (expected + CALC_ERROR) && result >= (expected - CALC_ERROR), "");
+	}
+
+	@ParameterizedTest
+	@CsvSource({
+			"-3.14,0.00,1.00,0.00,0.00,0.00,0.00",
+			"2.00,0.00,0.00,0.69314718,0.69314718,1.60943791,0.6571538335"
+	})
+	void mockedSin(double x,
+			double mockSin,
+			double mockSec,
+			double mockLn,
+			double mockLn2,
+			double mockLn5,
+			double expected) {
+		Mockito.when(basicTrigonometry.sin(x)).thenReturn(mockSin);
+
+		FunctionSystem functionSystem = new FunctionSystem(new Trigonometry(basicTrigonometry), new Logarithm(new BasicLogarithm()));
 		double result = functionSystem.count(x);
 
 		Assert.isTrue(result <= (expected + CALC_ERROR) && result >= (expected - CALC_ERROR), "");
